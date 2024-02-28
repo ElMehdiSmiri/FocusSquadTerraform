@@ -1,0 +1,35 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+- job: TerraformJob
+  displayName: 'Validate Terraform'
+  steps:
+
+  - task: TerraformTaskV4@4
+    displayName: Terraform init
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      backendServiceArm: 'EMSSubscription'
+      backendAzureRmResourceGroupName: 'rg-terraform-backends'
+      backendAzureRmStorageAccountName: 'myterraformbackends'
+      backendAzureRmContainerName: 'focus-squad-tf-state'
+      backendAzureRmKey: 'terraform.tfstate'
+      
+  - task: TerraformTaskV4@4
+    displayName: Terraform validate
+    inputs:
+      provider: 'azurerm'
+      command: 'validate'
+
+  - task: TerraformTaskV4@4
+    displayName: Terraform plan
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      environmentServiceNameAzureRM: 'EMSSubscription'
+
